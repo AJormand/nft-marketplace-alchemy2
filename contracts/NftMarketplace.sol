@@ -91,6 +91,17 @@ contract NftMarketplace is ERC721URIStorage {
         _listedNfts.decrement();
     }
 
+    function cancelListing(uint256 nftId) public {
+        Nft memory nft = mintedNfts[nftId];
+        require(nft.owner == msg.sender, "You are not the owner of this NFT");
+        require(nft.isListed == true, "Nft is not listed");
+
+        //update Nft struct
+        nft.isListed = false;
+        nft.price = 0;
+        mintedNfts[nftId] = nft;
+    }
+
     //get listed nfts
     function getListedNfts() public view returns(Nft[] memory)  {
         Nft[] memory listedNftsArr = new Nft[](_listedNfts.current());
