@@ -5,9 +5,13 @@ import LoadingScreen from "./LoadingScreen";
 import { loader } from "@/assets";
 
 const NftDetails = ({ selectedNft, setSelectedNft }) => {
-  const { fetchContract, signer } = useContext(NftMarketplaceContext);
+  const { fetchContract, signer, currentAccount } = useContext(
+    NftMarketplaceContext
+  );
   const [price, setPrice] = useState(selectedNft.price);
   const [isLoading, setIsLoading] = useState(false);
+
+  console.log(signer.address);
 
   const listNft = async () => {
     try {
@@ -27,11 +31,18 @@ const NftDetails = ({ selectedNft, setSelectedNft }) => {
   const cancelListing = async () => {
     try {
       setIsLoading(true);
-      const tx = await fetchContract(11155111, signer).cancel;
+      const tx = await fetchContract(11155111, signer).cancelListing(
+        selectedNft.id
+      );
+      const receipt = await tx.wait();
+      setIsLoading(false);
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
     }
   };
+
+  const buyNft = async () => {};
 
   return (
     <>
@@ -47,13 +58,21 @@ const NftDetails = ({ selectedNft, setSelectedNft }) => {
 
           {/* BOX */}
           <div className="w-[300px] h-[500px] bg-white z-50 rounded-lg shadow-md p-4">
-            <div className="h-2/3">
-              <img src={selectedNft.uri} alt="" />
+            <div className="h-2/3 flex items-center justify-center">
+              <img src={selectedNft.image} className="max-h-full" alt="" />
             </div>
             <div className="h-1/3 p-2 text-sm">
               <div className="flex gap-2">
                 <p>id:</p>
                 <p>{selectedNft.id}</p>
+              </div>
+              <div className="flex gap-2">
+                <p>name:</p>
+                <p>{selectedNft.name}</p>
+              </div>
+              <div className="flex gap-2">
+                <p>Description:</p>
+                <p>{selectedNft.description}</p>
               </div>
               <div className="flex gap-2">
                 <p>Owner:</p>
@@ -78,18 +97,30 @@ const NftDetails = ({ selectedNft, setSelectedNft }) => {
               </div>
 
               <div className="flex w-full items-center justify-center gap-2 mt-5">
-                <button
-                  className="bg-blue-600 text-white font-bold rounded-lg p-1 w-28 disabled:bg-slate-300"
-                  disabled={!selectedNft.isListed}
-                >
-                  Cancel Listing
-                </button>
-                <button
-                  className="bg-blue-600 text-white font-bold rounded-lg p-1 w-28"
-                  onClick={listNft}
-                >
-                  List NFT
-                </button>
+                {selectedNft.owner == currentAccount ? (
+                  <>
+                    <button
+                      className="bg-blue-600 text-white font-bold rounded-lg p-1 w-28 disabled:bg-slate-300"
+                      disabled={!selectedNft.isListed}
+                      onClick={cancelListing}
+                    >
+                      Cancel Listing
+                    </button>
+                    <button
+                      className="bg-blue-600 text-white font-bold rounded-lg p-1 w-28"
+                      onClick={listNft}
+                    >
+                      List NFT
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="bg-blue-600 text-white font-bold rounded-lg p-1 w-28 disabled:bg-slate-300"
+                    onClick={buyNft}
+                  >
+                    Buy NFT
+                  </button>
+                )}
               </div>
             </div>
           </div>

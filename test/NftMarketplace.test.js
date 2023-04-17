@@ -208,6 +208,43 @@ const { developmentChains } = require("../helperHardhatConfig");
         });
       });
 
+      describe("cancelListing function", function () {
+        beforeEach(async () => {
+          await nftMarketplace.mint(tokenURI);
+          await nftMarketplace.listNft(1, ethers.utils.parseEther("0.001"));
+        });
+
+        it("should allow only the owner to delist the nft", async () => {
+          await expect(
+            nftMarketplace.connect(otherAccount).cancelListing(1)
+          ).to.be.revertedWith("You are not the owner of this NFT");
+        });
+
+        it("should allow only listed nfts to be delisted", async () => {
+          await nftMarketplace.mint(tokenURI);
+          await expect(nftMarketplace.cancelListing(2)).to.be.revertedWith(
+            "Nft is not listed"
+          );
+        });
+
+        it("should set isListed to false and price to 0", async () => {
+          const tx = await nftMarketplace.cancelListing(1);
+          const nft = await nftMarketplace.getMintedNfts(1);
+          assert.equal(nft.isListed, false);
+          assert.equal(nft.price, 0);
+        });
+
+        it("should decrement the number of listed nfts", async () => {
+          const listedNftsBeforeCancel = await nftMarketplace._listedNfts();
+          const tx = await nftMarketplace.cancelListing(1);
+          const listedNftsAfterCancel = await nftMarketplace._listedNfts();
+          assert.equal(
+            listedNftsAfterCancel.toNumber(),
+            listedNftsBeforeCancel.toNumber() - 1
+          );
+        });
+      });
+
       describe("getListedNfts function", function () {
         it("Should return array of listed nfts", async () => {
           const nft1 = await nftMarketplace.mint("Nft1");

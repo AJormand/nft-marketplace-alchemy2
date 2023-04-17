@@ -56,11 +56,10 @@ export const NftMarketplaceContextProvider = ({ children }) => {
       });
 
       if (accounts.length) {
-        setCurrentAccount(accounts[0]);
+        setCurrentAccount(ethers.utils.getAddress(accounts[0]));
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signerAccount = provider.getSigner();
         setSigner(signerAccount);
-        console.log(accounts[0]);
       } else {
         console.log("No Account found");
       }
@@ -78,7 +77,7 @@ export const NftMarketplaceContextProvider = ({ children }) => {
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
-      setCurrentAccount(accounts[0]);
+      setCurrentAccount(ethers.utils.getAddress(accounts[0]));
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signerAccount = provider.getSigner();
       setSigner(signerAccount);
@@ -92,8 +91,7 @@ export const NftMarketplaceContextProvider = ({ children }) => {
   const onAccountChange = async () => {
     window.ethereum.on("accountsChanged", (accounts) => {
       if (accounts.length > 0) {
-        setCurrentAccount(accounts[0]);
-        console.log(accounts[0]);
+        setCurrentAccount(ethers.utils.getAddress(accounts[0]));
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signerAccount = provider.getSigner();
         setSigner(signerAccount);

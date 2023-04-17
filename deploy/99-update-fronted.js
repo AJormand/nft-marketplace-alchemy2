@@ -29,7 +29,6 @@ const updateNetworkMapping = async () => {
   const nftMarketplace = await ethers.getContract("NftMarketplace");
   const nftMarketplaceAddress = nftMarketplace.address;
   const chainId = network.config.chainId;
-  console.log(chainId);
 
   const fileJSON = fs.readFileSync(frontendNetworkMApping, "utf8");
   const file = JSON.parse(fileJSON);
@@ -38,9 +37,6 @@ const updateNetworkMapping = async () => {
     file.push({ chainId: chainId, contractAddress: [nftMarketplaceAddress] });
   } else {
     for (let i = 0; i < file.length; i++) {
-      console.log(file.length);
-      console.log(file[0]);
-      console.log(file[0].chainId);
       if (
         file[i].chainId == chainId &&
         !file[i].contractAddress.includes(nftMarketplaceAddress)

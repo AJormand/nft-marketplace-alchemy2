@@ -100,6 +100,8 @@ contract NftMarketplace is ERC721URIStorage {
         nft.isListed = false;
         nft.price = 0;
         mintedNfts[nftId] = nft;
+
+        _listedNfts.decrement();
     }
 
     //get listed nfts
