@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import { useRouter } from "next/router";
 import axios from "axios";
 import FormData from "form-data";
 import { NftMarketplaceContext } from "@/context/NftMarketplaceContext";
@@ -9,6 +10,7 @@ const mintNft = () => {
   const { fetchContract, callContract, signer } = useContext(
     NftMarketplaceContext
   );
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [attachedImage, setAttachedImage] = useState(null);
   const [attachedImageUrl, setAttachedImageUrl] = useState(null);
@@ -19,10 +21,12 @@ const mintNft = () => {
     try {
       setIsLoading(true);
       const tokenURI = await uploadURItoPinata();
+      console.log("tokenURI", tokenURI);
       const tx = await fetchContract(11155111, signer).mint(tokenURI);
       const receipt = await tx.wait();
       console.log(receipt);
       setIsLoading(false);
+      router.push("/myNfts");
     } catch (error) {
       console.log(error);
       setIsLoading(false);
@@ -133,11 +137,13 @@ const mintNft = () => {
         <label htmlFor="description" className="font-semibold">
           Description
         </label>
-        <input
-          type="text"
+        <textarea
           id="description"
           name="description"
-          className="my-2 p-1 rounded-lg"
+          cols="10"
+          maxLength="285"
+          rows="8"
+          className="my-2 p-1 rounded-lg text-sm"
           onChange={handleFormChange}
         />
         <label htmlFor="image" className="font-semibold">

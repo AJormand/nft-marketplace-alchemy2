@@ -81,14 +81,14 @@ const { developmentChains } = require("../helperHardhatConfig");
           assert.equal(isListed, true);
           assert.equal(await nftMarketplace._listedNfts(), 1);
         });
-        it("Approves the marketplace contract to perform the sell", async () => {
-          await nftMarketplace.mint(tokenURI);
-          await nftMarketplace.listNft(1, ethers.utils.parseEther("0.001"));
-          assert.equal(
-            await nftMarketplace.getApproved(1),
-            nftMarketplace.address
-          );
-        });
+        // it("Approves the marketplace contract to perform the sell", async () => {
+        //   await nftMarketplace.mint(tokenURI);
+        //   await nftMarketplace.listNft(1, ethers.utils.parseEther("0.001"));
+        //   assert.equal(
+        //     await nftMarketplace.getApproved(1),
+        //     nftMarketplace.address
+        //   );
+        // });
         it("Allows only the owner to list", async () => {
           await nftMarketplace.mint(tokenURI);
           await expect(
@@ -185,6 +185,18 @@ const { developmentChains } = require("../helperHardhatConfig");
             sellerBalanceFinal.toString()
           );
         });
+        // it("Transfers the ownership of the Nft", async () => {
+        //   const listedNft = await nftMarketplace.getMintedNfts(1);
+        //   const initialOwner = await nftMarketplace.ownerOf(listedNft.id);
+        //   console.log(initialOwner);
+        //   const tx = await nftMarketplace
+        //     .connect(otherAccount)
+        //     .buyNft(listedNft.id, { value: listedNft.price });
+        //   const receipt = await tx.wait();
+        //   const finalOwner = await nftMarketplace.ownerOf(listedNft.id);
+        //   assert.equal(initialOwner, deployer.address);
+        //   assert.equal(finalOwner, otherAccount.address);
+        // });
         it("Updates owner and price in the Nft struct in mintedNfts mapping", async () => {
           nftStructListed = await nftMarketplace.getMintedNfts(1);
           await nftMarketplace

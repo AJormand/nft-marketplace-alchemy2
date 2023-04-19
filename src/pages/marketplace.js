@@ -5,7 +5,7 @@ import NftCard from "@/components/NftCard";
 import NftDetails from "@/components/NftDetails";
 
 const marketplace = () => {
-  const { setSigner, fetchContract, currentAccount } = useContext(
+  const { signer, setSigner, fetchContract, currentAccount } = useContext(
     NftMarketplaceContext
   );
   const [nfts, setNfts] = useState([]);
@@ -16,40 +16,70 @@ const marketplace = () => {
       `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
     );
     const fetchedNfts = await fetchContract(11155111, provider).getListedNfts();
-    console.log(fetchedNfts);
+
+    const fetchedNftsArr = await Promise.all(
+      fetchedNfts.map(async (fetchedNft) => {
+        return fetchNft(fetchedNft);
+      })
+    );
+    setNfts(fetchedNftsArr);
+    console.log(fetchedNftsArr);
   };
 
-  const fetchNftUri = async () => {
-    const nftsArr = fetchedNfts.map(async (fetchedNft) => {
-      const options = {
-        method: "POST",
-        body: fetchedNft[2],
-      };
-      const url = "./api/handleIpfs";
-      const res = await fetch(url, options);
-      const data = await res.json();
-      console.log(data.success);
+  const fetchNft = async (fetchedNft) => {
+    const options = {
+      method: "POST",
+      body: fetchedNft[2],
+    };
+    const url = "./api/handleIpfs";
+    const res = await fetch(url, options);
+    const data = await res.json();
 
-      //Ipfs gateway for loading image
-      const pinataGateway = "https://gateway.pinata.cloud/ipfs/";
-      //const ipfsGateway = "https://ipfs.io/ipfs/";
+    //Ipfs gateway for loading image
+    const pinataGateway = "https://gateway.pinata.cloud/ipfs/";
+    //const ipfsGateway = "https://ipfs.io/ipfs/";
 
-      return {
-        id: fetchedNft[0].toString(),
-        owner: fetchedNft[1],
-        name: data.success?.name,
-        description: data.success?.description,
-        image: data.success?.image?.replace("ipfs://", pinataGateway),
-        isListed: fetchedNft[3],
-        price: ethers.utils.formatEther(fetchedNft[4].toString()),
-      };
-    });
-    setNfts(nftsArr);
+    return {
+      id: fetchedNft[0].toString(),
+      owner: fetchedNft[1],
+      name: data.success?.name,
+      description: data.success?.description,
+      image: data.success?.image?.replace("ipfs://", pinataGateway),
+      isListed: fetchedNft[3],
+      price: ethers.utils.formatEther(fetchedNft[4].toString()),
+    };
   };
 
   useEffect(() => {
     fetchListedNfts();
   }, []);
+
+  useEffect(() => {
+    const handleNftDelistedEvent = (owner, tokenId, price) => {
+      setNfts((prevNfts) => prevNfts.filter((nft) => nft.id != tokenId));
+      setSelectedNft((prev) => ({ ...prev, price: "0", isListed: false }));
+    };
+    const handleNftBoughtEvent = (owner, tokenId, price) => {
+      setNfts((prevNfts) => prevNfts.filter((nft) => nft.id != tokenId));
+      setSelectedNft((prev) => ({
+        ...prev,
+        price: "0",
+        isListed: false,
+        owner: owner,
+      }));
+    };
+    const contract = fetchContract(11155111, signer);
+    if (window.ethereum && signer) {
+      contract
+        .on("NftDelisted", handleNftDelistedEvent)
+        .on("NftBought", handleNftBoughtEvent);
+    }
+
+    return () =>
+      contract
+        .off("NftDelisted", handleNftDelistedEvent)
+        .off("NftBought", handleNftBoughtEvent);
+  }, [signer]);
 
   return (
     <div className="flex justify-center flex-wrap gap-5">

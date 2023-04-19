@@ -4,7 +4,7 @@ import { loadingSpinner, loader } from "@/assets";
 
 const LoadingScreen = () => {
   return (
-    <div className="absolute top-0 w-full h-full bg-slate-50 bg-opacity-70 z-50 flex items-center justify-center">
+    <div className="fixed top-0 bottom-0 left-0 right-0 bg-slate-50 bg-opacity-70 z-50 flex items-center justify-center">
       <div className="bg-white p-10">
         <p>Processing...</p>
 

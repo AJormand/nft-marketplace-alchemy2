@@ -7,7 +7,11 @@ const NftCard = ({ data, setSelectedNft }) => {
       onClick={() => setSelectedNft(data)}
     >
       <div className="h-2/3 flex items-center justify-center overflow-hidden">
-        <img src={data.image} className="max-w-full" alt="" />
+        <img
+          src={data.image}
+          className="max-w-full max-h-full rounded-sm"
+          alt=""
+        />
       </div>
 
       <div className="h-1/3 p-2 text-xs">

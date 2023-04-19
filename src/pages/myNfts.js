@@ -19,7 +19,7 @@ const myNfts = () => {
 
     const options = {
       method: "POST",
-      body: fetchedNft[2],
+      body: fetchedNft[2], //uri ipfs://xcvsf
     };
     const url = "./api/handleIpfs";
     const res = await fetch(url, options);
@@ -42,9 +42,8 @@ const myNfts = () => {
 
   const fetchMyNfts = async () => {
     console.log(currentAccount);
-    const nftIds = await fetchContract(11155111, signer).getOwnedNfts(
-      currentAccount
-    );
+    const contract = await fetchContract(11155111, signer);
+    const nftIds = await contract.getOwnedNfts(currentAccount);
 
     const fetchedNftsArr = await Promise.all(
       nftIds.map(async (nftId) => {
@@ -60,6 +59,49 @@ const myNfts = () => {
       fetchMyNfts();
     }
   }, [currentAccount]);
+
+  //Event listeners
+  useEffect(() => {
+    const handleNftListedEvent = (owner, tokenId, price) => {
+      // console.log(tokenId.toString());
+      // console.log(ethers.utils.formatEther(price.toString()));
+      setNfts((prevNfts) =>
+        prevNfts.map((nft) => {
+          if (nft.id == tokenId.toString()) {
+            nft.price = ethers.utils.formatEther(price.toString());
+            nft.isListed = true;
+            setSelectedNft(nft);
+          }
+          return nft;
+        })
+      );
+    };
+    const handleNftDelistedEvent = (owner, tokenId, price) => {
+      // console.log(tokenId.toString());
+      // console.log(ethers.utils.formatEther(price.toString()));
+      setNfts((prevNfts) =>
+        prevNfts.map((nft) => {
+          if (nft.id == tokenId.toString()) {
+            nft.price = ethers.utils.formatEther(price.toString());
+            nft.isListed = false;
+            setSelectedNft(nft);
+          }
+          return nft;
+        })
+      );
+    };
+    const contract = fetchContract(11155111, signer);
+
+    if (window.ethereum && signer) {
+      contract.on("NftListed", handleNftListedEvent);
+      contract.on("NftDelisted", handleNftDelistedEvent);
+    }
+
+    return () => {
+      contract.off("NftListed", handleNftListedEvent);
+      contract.off("NftDelisted", handleNftDelistedEvent);
+    };
+  }, [signer]);
 
   return (
     <div className="flex justify-center flex-wrap gap-5">

@@ -28,8 +28,9 @@ contract NftMarketplace is ERC721URIStorage {
     }
 
     event NftMinted(address indexed owner, uint256 indexed tokenId);
-    event NftListed(address indexed owner, uint256 indexed tokenId);
-
+    event NftListed(address indexed owner, uint256 indexed tokenId, uint256 price);
+    event NftDelisted(address indexed owner, uint256 indexed tokenId, uint256 price);
+    event NftBought(address indexed owner, uint256 indexed tokenId, uint256 price);
 
     function mint(string memory tokenURI) public  {
         _nftId.increment();
@@ -51,9 +52,10 @@ contract NftMarketplace is ERC721URIStorage {
         nft.isListed = true;
         nft.price = price;
         mintedNfts[nftId] = nft;
-        approve(address(this), nftId);
+        // Not using the ERC721 token ownership functions
+        // approve(address(this), nftId);
         _listedNfts.increment();
-        emit NftListed(msg.sender, nftId);
+        emit NftListed(msg.sender, nftId, price);
     }
 
     function buyNft(uint nftId) public payable {
@@ -63,6 +65,9 @@ contract NftMarketplace is ERC721URIStorage {
         require(nft.owner != msg.sender, "You cant buy your own NFT");
         require(nft.isListed == true, "NFT that you are trying to buy is not listed for sale");
         require(nft.price == msg.value, "You have not payed the correct price");
+
+        // Not using the ERC721 token ownership functions
+        // safeTransferFrom(seller, buyer, nftId);
 
         //update Nft struct
         nft.isListed = false;
@@ -89,6 +94,7 @@ contract NftMarketplace is ERC721URIStorage {
         payable(seller).transfer(msg.value);
 
         _listedNfts.decrement();
+        emit NftBought(buyer, nftId, nft.price);
     }
 
     function cancelListing(uint256 nftId) public {
@@ -102,6 +108,7 @@ contract NftMarketplace is ERC721URIStorage {
         mintedNfts[nftId] = nft;
 
         _listedNfts.decrement();
+        emit NftDelisted(nft.owner, nftId, 0);
     }
 
     //get listed nfts
