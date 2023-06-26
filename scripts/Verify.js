@@ -7,6 +7,8 @@ const verify = async (args) => {
     address: nftMarketplace.address,
     constructorArguments: [args],
   });
+
+  console.log("Contract verified at: ", nftMarketplace.address);
 };
 
 module.exports = { verify };

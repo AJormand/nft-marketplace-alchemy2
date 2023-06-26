@@ -16,6 +16,7 @@ const marketplace = () => {
       `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
     );
     const fetchedNfts = await fetchContract(11155111, provider).getListedNfts();
+    console.log(fetchedNfts);
 
     const fetchedNftsArr = await Promise.all(
       fetchedNfts.map(async (fetchedNft) => {
@@ -82,19 +83,24 @@ const marketplace = () => {
   }, [signer]);
 
   return (
-    <div className="flex justify-center flex-wrap gap-5">
-      {nfts.length > 0 ? (
-        nfts.map((nft, index) => (
-          <NftCard data={nft} key={index} setSelectedNft={setSelectedNft} />
-        ))
-      ) : (
-        <div>No NFTs listed for sale</div>
-      )}
+    <div className="flex justify-center">
+      <div className="flex w-[70%] justify-center flex-wrap gap-5">
+        {nfts.length > 0 ? (
+          nfts.map((nft, index) => (
+            <NftCard data={nft} key={index} setSelectedNft={setSelectedNft} />
+          ))
+        ) : (
+          <div>No NFTs listed for sale</div>
+        )}
 
-      {/* NFT DETAILS */}
-      {selectedNft && (
-        <NftDetails selectedNft={selectedNft} setSelectedNft={setSelectedNft} />
-      )}
+        {/* NFT DETAILS */}
+        {selectedNft && (
+          <NftDetails
+            selectedNft={selectedNft}
+            setSelectedNft={setSelectedNft}
+          />
+        )}
+      </div>
     </div>
   );
 };

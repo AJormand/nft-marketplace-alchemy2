@@ -18,7 +18,9 @@ const Navbar = () => {
   return (
     <div className="flex justify-center text-lg border-b-2 mb-10">
       <div className="flex justify-between items-center w-[80%] p-2">
-        <div className="text-blue-600 font-extrabold">NFT Marketplace</div>
+        <div className="text-blue-600 font-extrabold">
+          <Link href="/">NFT Marketplace</Link>
+        </div>
         <div className="flex items-center gap-7">
           <ul className="flex items-center gap-10 font-semibold mr-10">
             <li className="hover:bg-slate-50 p-1 rounded-lg">

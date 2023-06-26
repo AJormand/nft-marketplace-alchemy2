@@ -16,6 +16,7 @@ const myNfts = () => {
     const fetchedNft = await fetchContract(11155111, signer).getMintedNfts(
       nftId
     );
+    console.log(fetchedNft);
 
     const options = {
       method: "POST",
