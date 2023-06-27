@@ -16,7 +16,6 @@ const marketplace = () => {
       `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
     );
     const fetchedNfts = await fetchContract(11155111, provider).getListedNfts();
-    console.log(fetchedNfts);
 
     const fetchedNftsArr = await Promise.all(
       fetchedNfts.map(async (fetchedNft) => {
