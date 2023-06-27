@@ -12,6 +12,7 @@ const connectingWithSmartContract = async () => {
     const connection = await web3Modal.connect();
     const provider = new ethers.providers.Web3Provider(connection);
     const signer = provider.getSigner();
+    console.log("signer", signer);
     const chainId = (await provider.getNetwork()).chainId;
     console.log(chainId);
     const contract = fetchContract(signer, chainId);

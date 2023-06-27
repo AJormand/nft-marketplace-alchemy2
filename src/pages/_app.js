@@ -9,24 +9,24 @@ import {
   w3mProvider,
 } from "@web3modal/ethereum";
 import { Web3Modal } from "@web3modal/react";
-import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { sepolia, goerli } from "wagmi/chains";
 
 const chains = [sepolia, goerli];
 const projectId = "814f1bd9aa1ee6f27452d1d8b01488bf";
 
-const { provider } = configureChains(chains, [w3mProvider({ projectId })]);
-const wagmiClient = createClient({
+const { publicClient } = configureChains(chains, [w3mProvider({ projectId })]);
+const wagmiConfig = createConfig({
   autoConnect: true,
-  connectors: w3mConnectors({ projectId, version: 1, chains }),
-  provider,
+  connectors: w3mConnectors({ projectId, chains }),
+  publicClient,
 });
-const ethereumClient = new EthereumClient(wagmiClient, chains);
+const ethereumClient = new EthereumClient(wagmiConfig, chains);
 
 export default function App({ Component, pageProps }) {
   return (
     <NftMarketplaceContextProvider>
-      <WagmiConfig client={wagmiClient}>
+      <WagmiConfig config={wagmiConfig}>
         <Navbar />
         <Component {...pageProps} />
       </WagmiConfig>
